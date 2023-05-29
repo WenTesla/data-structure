@@ -11,6 +11,7 @@ int fib(int n)
     }
     for (int i = 3; i <= n; i++)
     {
+        // 交换顺序
         f3 = f1 + f2;
         f1 = f2;
         f2 = f3;
