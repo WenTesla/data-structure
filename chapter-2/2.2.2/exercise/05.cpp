@@ -1,4 +1,4 @@
-// 在有序（递增有序）的顺序表中删除其值在定值s和t的所有元素，若不合理或空，则显示错误
+// 在顺序表中删除其值在定值s和t的所有元素（s<t)，若不合理或空，则显示错误
 
 #include <stdio.h>
 
@@ -64,7 +64,7 @@ bool ListDelete(SqlList &L, int i, ElemType &e)
     L.length--;
     return true;
 };
-
+// 从后往前扫描顺序表，每遇到一个值在s和t之间，则删除一个元素，其后元素全部前移动 但这种算法效率不高
 bool ListDelElems(SqlList &L, int min, int max)
 {
     int tmp;
@@ -73,19 +73,34 @@ bool ListDelElems(SqlList &L, int min, int max)
     {
         return false;
     }
-    //
-    for (i = 0; i < L.length && L.data[i] < min; i++)
-        ;
-    for (j = L.length - 1; j > 0 && L.data[j] > max; j--)
-        ;
-    // 删除i和j之间的元素
-    int len = j - i + 1;
-    i++;
-    while (len--)
+    for (int i = L.length - 1; i >= 0; i--)
     {
-        ListDelete(L, i, tmp);
+        if (L.data[i] > min && L.data[i] < max)
+        {
+            ListDelete(L, i + 1, tmp);
+        }
     }
-
+    return true;
+}
+// 官方
+// 算法思想:从前向后扫描顺序表L，用k记录下元素值在s到t之间元索的个数（初始时k=0)。
+// 对于当前扫描的元素，若其值不在s到t之间，则前移k个位置;否则执行k++。
+// 由于这样每个不在s到t之间的元素仅移动一次,因此算法效率高。
+bool Del_s_t(SqlList &L, int min, int max)
+{
+    int k = 0;
+    for (int i = 0; i < L.length; i++)
+    {
+        if (L.data[i] > min && L.data[i] < max)
+        {
+            k++;
+        }
+        else
+        {
+            // 前移k个位置
+            L.data[i] = L.data[i + k];
+        }
+    }
     return true;
 }
 
@@ -93,6 +108,7 @@ int main()
 {
     SqlList l;
     // ListInsert(l, 1, 11);
+    ListInsert(l, 1, 10);
     ListInsert(l, 1, 10);
     ListInsert(l, 1, 9);
     ListInsert(l, 1, 8);
@@ -102,8 +118,8 @@ int main()
     ListInsert(l, 1, 4);
     ListInsert(l, 1, 3);
     ListInsert(l, 1, 2);
-    ListInsert(l, 1, 1);
+    ListInsert(l, 1, 55);
     ListShow(l);
-    ListDelElems(l, 4, 5);
+    ListDelElems(l, 3, 5);
     ListShow(l);
 }

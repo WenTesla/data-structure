@@ -1,11 +1,11 @@
-// 在有序（递增有序）的顺序表中删除其值在定值s和t的所有元素，若不合理或空，则显示错误
+// 从有序表中删除所有值重复的值，
 
 #include <stdio.h>
 
 #define MaxSize 50
 
 typedef int ElemType;
-// 静态
+// 静态 长度从0 开始，表示线性表的长度
 typedef struct
 {
     ElemType data[MaxSize];
@@ -56,7 +56,7 @@ bool ListDelete(SqlList &L, int i, ElemType &e)
         return false;
     }
     e = L.data[i - 1];
-    printf("元素%d已删除\n", L.data[i - 1]);
+    printf("线性表中索引为%d元素%d已删除\n", i - 1, L.data[i - 1]);
     for (int j = i; j < L.length; j++)
     {
         L.data[j - 1] = L.data[j];
@@ -64,28 +64,52 @@ bool ListDelete(SqlList &L, int i, ElemType &e)
     L.length--;
     return true;
 };
-
-bool ListDelElems(SqlList &L, int min, int max)
+// 双层循环，外层遍历所有值，内循环遍历重复的值
+void ListDelDuplicate(SqlList &L, ElemType e)
 {
     int tmp;
-    int i, j;
-    if (min > max || min < 0 || max > L.length || L.length == 0)
+    // 遍历数组
+    for (int i = 0; i < L.length; i++)
+    {
+        int cur = L.data[i];
+        for (int j = i + 1; j < L.length;)
+        {
+            if (cur == L.data[j])
+            {
+                ListDelete(L, j + 1, tmp);
+            }
+            else
+            {
+                j++;
+            }
+        }
+    }
+};
+
+// 官方
+// 算法思想:注意是有序顺序表，值相同的元素一定在连续的位置上。
+// 用类似于直接插入排序的思想，初始时将第一个元素视为非重复的有序表。
+// 之后依次判断后面的元素是否与前面非重复有序表的最后一个元素相同，
+// 若相同，则继续向后判断，若不同，则插入前面的非重复有序表的最后,直至判断到表尾为止。
+bool Delete_Same(SqlList &L, ElemType e)
+{
+    if (L.length == 0)
     {
         return false;
     }
+
+    ElemType cur = -1;
     //
-    for (i = 0; i < L.length && L.data[i] < min; i++)
-        ;
-    for (j = L.length - 1; j > 0 && L.data[j] > max; j--)
-        ;
-    // 删除i和j之间的元素
-    int len = j - i + 1;
-    i++;
-    while (len--)
+    int i, j;
+    for (i = 0, j = 1; j < L.length; j++)
     {
-        ListDelete(L, i, tmp);
+        if (L.data[i] != L.data[j])
+        {
+            L.data[++i] = L.data[j];
+        }
     }
 
+    L.length = i + 1;
     return true;
 }
 
@@ -93,6 +117,11 @@ int main()
 {
     SqlList l;
     // ListInsert(l, 1, 11);
+    ListInsert(l, 1, 10);
+    ListInsert(l, 1, 10);
+    ListInsert(l, 1, 10);
+    ListInsert(l, 1, 10);
+    ListInsert(l, 1, 10);
     ListInsert(l, 1, 10);
     ListInsert(l, 1, 9);
     ListInsert(l, 1, 8);
@@ -102,8 +131,9 @@ int main()
     ListInsert(l, 1, 4);
     ListInsert(l, 1, 3);
     ListInsert(l, 1, 2);
-    ListInsert(l, 1, 1);
+    ListInsert(l, 1, 55);
     ListShow(l);
-    ListDelElems(l, 4, 5);
+    // ListDelDuplicate(l, 10);
+    Delete_Same(l, 10);
     ListShow(l);
 }
